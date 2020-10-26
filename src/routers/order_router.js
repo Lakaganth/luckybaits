@@ -112,6 +112,42 @@ router.patch('/order/transfer/:id', async (req, res) =>{
   }
 })
 
+/**
+*  @METHOD: PATCH
+*  @Auth: Admin
+*  @param: order ID   
+*  @description : admin abitiy to edit the order
+*/
+
+router.patch('/order/transfer/:id', async (req, res) =>{
+    const updates = Object.keys(req.body);
+    const allowedUpdates = ['sku','part','currentDept', 'transfers','quantity','quantityDone','status','receipt','pick','currentDept','orderComplete','orderCompleteTime'];
+    const isValidOperation = updates.every((update) =>
+    allowedUpdates.includes(update)
+  );
+  const id = req.params.id;
+  if (!isValidOperation) {
+    return res.status(400).send({ error: "Invalid update operation" });
+  }
+  try {
+
+    const order = await Order.findById(id);
+
+    if(!order){
+        return res.status(404).send({error: "Order Not found"})
+    }
+
+    updates.forEach(update=> {
+        order[update] = req.body[update]
+    });
+    await order.save();
+    res.send(order);
+      
+  } catch (err) {
+    res.status(400).send(err);
+  }
+})
+
 
 
 module.exports = router;
