@@ -1,0 +1,14 @@
+{
+  "name": "luckybait",
+  "version": "1.0.0",
+  "description": "Order processing web app",
+  "main": "index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "env-cmd -f ./config/dev.env nodemon src/index.js"
+    
+  },
+  "keywords": [],
+  "author": "Team roots 2020",
+  "license": "ISC"
+}
