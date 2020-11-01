@@ -15,7 +15,7 @@ const OrderSchema = new mongoose.Schema({
     },
     quantityDone:{
         type: Number,
-        // required: true,
+    
     },
     status:{
         type: String,

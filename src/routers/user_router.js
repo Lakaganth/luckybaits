@@ -4,7 +4,7 @@ const router = new express.Router();
 
 router.get('/', async(req, res)=>{
     try {
-        res.status(200).send("Welcome to lucky strike");
+        res.status(200).send("Welcome to Lucky Strike Bait Works");
     } catch (err) {
         res.status(400).send(err);
     }

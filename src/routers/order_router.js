@@ -32,7 +32,7 @@ router.post('/order/new',  async(req,res)=>{
 *  @description : List of all the orders
 */
 
-router.get('/order/all',  async(req,res)=>{
+router.get('/order/all', async(req,res)=>{
     const match = {};
     const sort = {};
     if (req.query.completed) {
@@ -55,7 +55,7 @@ router.get('/order/all',  async(req,res)=>{
 *  @METHOD: GET
 *  @Auth: general
 *  @param: order ID   
-*  @description : List of single order
+*  @description : Get of single order
 */
 
 router.get('/order/:id', async(req,res)=>{
