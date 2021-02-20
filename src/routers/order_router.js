@@ -127,7 +127,27 @@ router.get("/order/:id", async (req, res) => {
     }
     res.status(200).send(order);
   } catch (err) {
-    res.status(500).send(e);
+    res.status(500).send(err);
+  }
+});
+/**
+ *  @METHOD: GET
+ *  @Auth: general
+ *  @param: SKU ID
+ *  @description : Get of BOM
+ */
+
+router.get("/bom/:sku", async (req, res) => {
+  const _id = req.params.sku.toString();
+  try {
+    console.log(_id);
+    const bom = await Bom.findById(_id);
+    if (!bom) {
+      return res.status(400);
+    }
+    res.status(200).send(bom);
+  } catch (err) {
+    res.status(500).send(err);
   }
 });
 
