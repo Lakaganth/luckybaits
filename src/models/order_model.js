@@ -1,71 +1,93 @@
 const mongoose = require("mongoose");
 
-const OrderSchema = new mongoose.Schema({
-    sku:{
-        type: String,
-        required: true,
+const OrderSchema = new mongoose.Schema(
+  {
+    sku: {
+      type: String,
     },
-    part:{
-        type: String,
-        required: true,
+    description: {
+      type: String,
     },
-    quantity:{
-        type: Number,
-        required: true,
+    weeks2: {
+      type: String,
     },
-    quantityDone:{
-        type: Number,
-    
+    weeks4: {
+      type: String,
     },
-    status:{
-        type: String,
-        enum: ['new', 'partial', 'completed'],
-        default: 'new',
-        required: true,
+
+    priority: {
+      type: String,
+      enum: ["high", "low"],
+      default: "low",
     },
-    receipt:{
-        type: Number,
-        required: true,
+    ioQty: {
+      type: String,
     },
-    pick:{
-        type: String,
-        required: true,
+    totalNeeded: {
+      type: String,
     },
-    currentDept:{
-        type: String,
-        enum: ['Assembly', 'Painting', 'Home Worker', 'Plating', 'Stamping', 'Nets' , 'Purchasing'],
-        default:'Assembly',
-        required:true
+    cat: {
+      type: String,
+    },
+    currentDept: {
+      type: String,
+      enum: [
+        "Assembly",
+        "Painting",
+        "Home Worker",
+        "Plating",
+        "Stamping",
+        "Nets",
+        "Purchasing",
+      ],
+      default: "Assembly",
+      required: true,
     },
     orderComplete: {
-        type: Boolean,
-        default: false,        
+      type: Boolean,
+      default: false,
     },
     orderCompleteTime: {
-        type: Date,
+      type: Date,
     },
     transfers: [
-        {
-            currentDept:{
-                type: String,
-                enum: ['Assembly', 'Painting', 'Home Worker', 'Plating', 'Stamping', 'Nets' , 'Purchasing'],
-        default:'Assembly',
-            },
-            time:{
-                type: Date,
-                default: Date.now,
-            },
-            availDept:{
-                type: String,
-                enum: ['Assembly', 'Painting', 'Home Worker', 'Plating', 'Stamping', 'Nets' , 'Purchasing'],
-            }
-        }
-    ]
-
-},
-{
-    timestamps:true,
-});
+      {
+        currentDept: {
+          type: String,
+          enum: [
+            "Assembly",
+            "Painting",
+            "Home Worker",
+            "Plating",
+            "Stamping",
+            "Nets",
+            "Purchasing",
+          ],
+          default: "Assembly",
+        },
+        time: {
+          type: Date,
+          default: Date.now,
+        },
+        availDept: {
+          type: String,
+          enum: [
+            "Assembly",
+            "Painting",
+            "Home Worker",
+            "Plating",
+            "Stamping",
+            "Nets",
+            "Purchasing",
+          ],
+        },
+      },
+    ],
+  },
+  {
+    timestamps: true,
+  }
+);
 
 const Order = mongoose.model("Orders", OrderSchema);
 
