@@ -99,6 +99,7 @@ router.get("/order/all", async (req, res) => {
     const parts = req.query.sortBy.split(":");
     sort[parts[0]] = part[1] === "desc" ? -1 : 1;
   }
+  console.log("Hello");
 
   try {
     const order = await Order.find()
