@@ -92,6 +92,8 @@ router.get("/order/all", async (req, res) => {
   const sort = {};
   const pagination = req.query.pagination ? parseInt(req.query.pagination) : 10;
   const page = req.query.page ? parseInt(req.query.page) : 1;
+  const prior = req.query.prior ? req.query.prior : false;
+  const priorValue = prior ? "high" : "low";
   if (req.query.completed) {
     match.completed = req.query.completed === "true";
   }
@@ -99,13 +101,19 @@ router.get("/order/all", async (req, res) => {
     const parts = req.query.sortBy.split(":");
     sort[parts[0]] = part[1] === "desc" ? -1 : 1;
   }
-  console.log("Hello");
 
   try {
-    const order = await Order.find()
+    const order = await Order.find({ priority: `${priorValue}` })
       .skip((page - 1) * pagination)
       .limit(pagination);
     res.status(200).send(order);
+    // if (prior) {
+    //   const highPrior = order.filter((o) => o.priority == "high");
+    //   console.log(highPrior);
+    // } else {
+    //   const lowPrior = order.filter((o) => o.priority == "low");
+    //   res.status(200).send(lowPrior);
+    // }
   } catch (err) {
     res.status(500).send(err);
   }
@@ -120,11 +128,42 @@ router.get("/order/all", async (req, res) => {
 
 router.get("/order/:id", async (req, res) => {
   const _id = req.params.id;
+
   try {
     const order = await Order.findById(_id);
     if (!order) {
       return res.status(400);
     }
+
+    res.status(200).send(order);
+  } catch (err) {
+    res.status(500).send(err);
+  }
+});
+/**
+ *  @METHOD: POST
+ *  @Auth: general
+ *  @param: order ID
+ *  @description : Get of single order
+ */
+
+router.post("/order/priority/:id", async (req, res) => {
+  const _id = req.params.id;
+  const prior = req.query.prior;
+  try {
+    const order = await Order.findById(_id);
+    if (!order) {
+      return res.status(400);
+    }
+    let priorValue;
+    if (prior == "true") {
+      priorValue = "high";
+    } else {
+      priorValue = "low";
+    }
+    console.log(prior);
+    order.priority = priorValue;
+    await order.save();
     res.status(200).send(order);
   } catch (err) {
     res.status(500).send(err);
@@ -199,20 +238,40 @@ router.patch("/order/transfer/:id", async (req, res) => {
 
 router.patch("/order/transfer/:id", async (req, res) => {
   const updates = Object.keys(req.body);
-  const allowedUpdates = [
-    "sku",
-    "part",
-    "currentDept",
-    "transfers",
-    "quantity",
-    "quantityDone",
-    "status",
-    "receipt",
-    "pick",
-    "currentDept",
-    "orderComplete",
-    "orderCompleteTime",
-  ];
+  const allowedUpdates = ["currentDept", "transfers"];
+  const isValidOperation = updates.every((update) =>
+    allowedUpdates.includes(update)
+  );
+  const id = req.params.id;
+  if (!isValidOperation) {
+    return res.status(400).send({ error: "Invalid update operation" });
+  }
+  try {
+    const order = await Order.findById(id);
+
+    if (!order) {
+      return res.status(404).send({ error: "Order Not found" });
+    }
+
+    updates.forEach((update) => {
+      order[update] = req.body[update];
+    });
+    await order.save();
+    res.send(order);
+  } catch (err) {
+    res.status(400).send(err);
+  }
+});
+/**
+ *  @METHOD: PATCH
+ *  @Auth: Admin
+ *  @param: order ID
+ *  @description : admin abitiy to edit the order
+ */
+
+router.patch("/order/transfer/:id", async (req, res) => {
+  const updates = Object.keys(req.body);
+  const allowedUpdates = ["currentDept", "currentDept"];
   const isValidOperation = updates.every((update) =>
     allowedUpdates.includes(update)
   );
