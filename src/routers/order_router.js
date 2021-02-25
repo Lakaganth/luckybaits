@@ -92,6 +92,7 @@ router.get("/order/all", async (req, res) => {
   const sort = {};
   const pagination = req.query.pagination ? parseInt(req.query.pagination) : 10;
   const page = req.query.page ? parseInt(req.query.page) : 1;
+  const filter = req.query.filter ? req.query.filter : "all";
   const prior = req.query.prior ? req.query.prior : false;
   const priorValue = prior ? "high" : "low";
   if (req.query.completed) {
@@ -101,19 +102,22 @@ router.get("/order/all", async (req, res) => {
     const parts = req.query.sortBy.split(":");
     sort[parts[0]] = part[1] === "desc" ? -1 : 1;
   }
-
   try {
-    const order = await Order.find({ priority: `${priorValue}` })
-      .skip((page - 1) * pagination)
-      .limit(pagination);
-    res.status(200).send(order);
-    // if (prior) {
-    //   const highPrior = order.filter((o) => o.priority == "high");
-    //   console.log(highPrior);
-    // } else {
-    //   const lowPrior = order.filter((o) => o.priority == "low");
-    //   res.status(200).send(lowPrior);
-    // }
+    if (filter == "all") {
+      const order = await Order.find({ priority: `${priorValue}` })
+        .skip((page - 1) * pagination)
+        .limit(pagination);
+      res.status(200).send(order);
+    } else {
+      const order = await Order.find({
+        currentDept: `${filter}`,
+        priority: `${priorValue}`,
+      })
+        .skip((page - 1) * pagination)
+        .limit(pagination);
+      console.log(order);
+      res.status(200).send(order);
+    }
   } catch (err) {
     res.status(500).send(err);
   }
