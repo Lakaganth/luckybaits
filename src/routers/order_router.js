@@ -94,7 +94,8 @@ router.get("/order/all", async (req, res) => {
   const page = req.query.page ? parseInt(req.query.page) : 1;
   const filter = req.query.filter ? req.query.filter : "all";
   const prior = req.query.prior ? req.query.prior : false;
-  const priorValue = prior ? "high" : "low";
+  const priorValue = prior === "true" ? "high" : "low";
+
   if (req.query.completed) {
     match.completed = req.query.completed === "true";
   }
@@ -115,7 +116,7 @@ router.get("/order/all", async (req, res) => {
       })
         .skip((page - 1) * pagination)
         .limit(pagination);
-      console.log(order);
+
       res.status(200).send(order);
     }
   } catch (err) {
@@ -165,7 +166,7 @@ router.post("/order/priority/:id", async (req, res) => {
     } else {
       priorValue = "low";
     }
-    console.log(prior);
+
     order.priority = priorValue;
     await order.save();
     res.status(200).send(order);
@@ -183,7 +184,6 @@ router.post("/order/priority/:id", async (req, res) => {
 router.get("/bom/:sku", async (req, res) => {
   const _id = req.params.sku.toString();
   try {
-    console.log(_id);
     const bom = await Bom.findById(_id);
     if (!bom) {
       return res.status(400);
@@ -220,7 +220,6 @@ router.patch("/order/transfer/:id", async (req, res) => {
 
     updates.forEach((update) => {
       if (update == "transfers") {
-        console.log(req.body[update]);
         order[update] = order[update].concat(req.body[update]);
       } else {
         order[update] = req.body[update];
