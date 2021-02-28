@@ -95,6 +95,9 @@ router.get("/order/all", async (req, res) => {
   const filter = req.query.filter ? req.query.filter : "all";
   const prior = req.query.prior ? req.query.prior : false;
   const priorValue = prior === "true" ? "high" : "low";
+  const search = req.query.search ? req.query.search : "";
+
+  console.log(search);
 
   if (req.query.completed) {
     match.completed = req.query.completed === "true";
@@ -104,6 +107,12 @@ router.get("/order/all", async (req, res) => {
     sort[parts[0]] = part[1] === "desc" ? -1 : 1;
   }
   try {
+    if (search != "") {
+      const order = await Order.find({ sku: `${search}` })
+        .skip((page - 1) * pagination)
+        .limit(pagination);
+      res.status(200).send(order);
+    }
     if (filter == "all") {
       const order = await Order.find({ priority: `${priorValue}` })
         .skip((page - 1) * pagination)
