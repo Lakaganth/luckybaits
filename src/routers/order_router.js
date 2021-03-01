@@ -97,8 +97,6 @@ router.get("/order/all", async (req, res) => {
   const priorValue = prior === "true" ? "high" : "low";
   const search = req.query.search ? req.query.search : "";
 
-  console.log(search);
-
   if (req.query.completed) {
     match.completed = req.query.completed === "true";
   }
