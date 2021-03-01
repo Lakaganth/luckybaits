@@ -107,6 +107,8 @@ router.get("/order/all", async (req, res) => {
     sort[parts[0]] = part[1] === "desc" ? -1 : 1;
   }
   try {
+    const count = await Order.estimatedDocumentCount();
+    console.log(count);
     if (search != "") {
       const order = await Order.find({ sku: `${search}` })
         .skip((page - 1) * pagination)
@@ -178,7 +180,11 @@ router.post("/order/priority/:id", async (req, res) => {
 
     order.priority = priorValue;
     await order.save();
-    res.status(200).send(order);
+    const docCount = await Order.estimatedDocumentCount();
+    const highOrderCount = await Order.countDocuments({ priority: "high" });
+    const lowOrderCount = await Order.countDocuments({ priority: "low" });
+
+    res.status(200).send({ order, docCount, highOrderCount, lowOrderCount });
   } catch (err) {
     res.status(500).send(err);
   }
@@ -241,68 +247,9 @@ router.patch("/order/transfer/:id", async (req, res) => {
   }
 });
 
-/**
- *  @METHOD: PATCH
- *  @Auth: Admin
- *  @param: order ID
- *  @description : admin abitiy to edit the order
- */
-
-router.patch("/order/transfer/:id", async (req, res) => {
-  const updates = Object.keys(req.body);
-  const allowedUpdates = ["currentDept", "transfers"];
-  const isValidOperation = updates.every((update) =>
-    allowedUpdates.includes(update)
-  );
-  const id = req.params.id;
-  if (!isValidOperation) {
-    return res.status(400).send({ error: "Invalid update operation" });
-  }
+router.get("/order/metadata", async (req, res) => {
   try {
-    const order = await Order.findById(id);
-
-    if (!order) {
-      return res.status(404).send({ error: "Order Not found" });
-    }
-
-    updates.forEach((update) => {
-      order[update] = req.body[update];
-    });
-    await order.save();
-    res.send(order);
-  } catch (err) {
-    res.status(400).send(err);
-  }
-});
-/**
- *  @METHOD: PATCH
- *  @Auth: Admin
- *  @param: order ID
- *  @description : admin abitiy to edit the order
- */
-
-router.patch("/order/transfer/:id", async (req, res) => {
-  const updates = Object.keys(req.body);
-  const allowedUpdates = ["currentDept", "currentDept"];
-  const isValidOperation = updates.every((update) =>
-    allowedUpdates.includes(update)
-  );
-  const id = req.params.id;
-  if (!isValidOperation) {
-    return res.status(400).send({ error: "Invalid update operation" });
-  }
-  try {
-    const order = await Order.findById(id);
-
-    if (!order) {
-      return res.status(404).send({ error: "Order Not found" });
-    }
-
-    updates.forEach((update) => {
-      order[update] = req.body[update];
-    });
-    await order.save();
-    res.send(order);
+    res.status(200).send(count);
   } catch (err) {
     res.status(400).send(err);
   }
