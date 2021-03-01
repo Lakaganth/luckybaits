@@ -247,12 +247,4 @@ router.patch("/order/transfer/:id", async (req, res) => {
   }
 });
 
-router.get("/order/metadata", async (req, res) => {
-  try {
-    res.status(200).send(count);
-  } catch (err) {
-    res.status(400).send(err);
-  }
-});
-
 module.exports = router;
