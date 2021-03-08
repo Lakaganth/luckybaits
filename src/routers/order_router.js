@@ -105,28 +105,32 @@ router.get("/order/all", async (req, res) => {
     sort[parts[0]] = part[1] === "desc" ? -1 : 1;
   }
   try {
-    const count = await Order.estimatedDocumentCount();
-    console.log(count);
+    const docCount = await Order.estimatedDocumentCount();
+    const highOrderCount = await Order.countDocuments({ priority: "high" });
+    const lowOrderCount = await Order.countDocuments({ priority: "low" });
+    const countData = { docCount, highOrderCount, lowOrderCount };
+
     if (search != "") {
       const order = await Order.find({ sku: `${search}` })
         .skip((page - 1) * pagination)
         .limit(pagination);
-      res.status(200).send(order);
+      res.status(200).send({ order, countData });
     }
     if (filter == "all") {
       const order = await Order.find({ priority: `${priorValue}` })
         .skip((page - 1) * pagination)
         .limit(pagination);
-      res.status(200).send(order);
+      res.status(200).send({ order, countData });
     } else {
       const order = await Order.find({
         currentDept: `${filter}`,
         priority: `${priorValue}`,
       })
         .skip((page - 1) * pagination)
-        .limit(pagination);
+        .limit(pagination)
+        .exec();
 
-      res.status(200).send(order);
+      res.status(200).send({ order, countData });
     }
   } catch (err) {
     res.status(500).send(err);
