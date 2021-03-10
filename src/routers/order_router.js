@@ -114,13 +114,15 @@ router.get("/order/all", async (req, res) => {
       const order = await Order.find({ sku: `${search}` })
         .skip((page - 1) * pagination)
         .limit(pagination);
-      res.status(200).send({ order, countData });
+      const orderLength = order.length;
+      res.status(200).send({ order, countData, orderLength });
     }
     if (filter == "all") {
       const order = await Order.find({ priority: `${priorValue}` })
         .skip((page - 1) * pagination)
         .limit(pagination);
-      res.status(200).send({ order, countData });
+      const orderLength = order.length;
+      res.status(200).send({ order, countData, orderLength });
     } else {
       const order = await Order.find({
         currentDept: `${filter}`,
@@ -129,8 +131,8 @@ router.get("/order/all", async (req, res) => {
         .skip((page - 1) * pagination)
         .limit(pagination)
         .exec();
-
-      res.status(200).send({ order, countData });
+      const orderLength = order.length;
+      res.status(200).send({ order, countData, orderLength });
     }
   } catch (err) {
     res.status(500).send(err);
