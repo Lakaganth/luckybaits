@@ -1,7 +1,7 @@
 const express = require("express");
 const Order = require("../models/order_model");
 const Bom = require("../models/bom_model");
-const auth = require("../middleware/auth");
+// const auth = require("../middleware/auth");
 
 // const mappedData = require("../script");
 // const bomData = require("../scriptbom");
@@ -21,6 +21,74 @@ router.post("/order/new", async (req, res) => {
   try {
     await order.save();
     res.status(200).send(order);
+  } catch (err) {
+    res.status(400).send(err);
+  }
+});
+
+/**
+ *  @METHOD: POST
+ *  @Auth: Admin
+ *  @description : Poat Orders from XLSX
+ */
+
+router.get("/order/deleteorders", async (res, req) => {
+  try {
+    await Order.deleteMany({});
+  } catch (err) {
+    res.status(400).send(err);
+  }
+});
+
+router.post("/order/uploadorders", async (req, res) => {
+  const orderList = [...req.body];
+
+  const mapData = orderList.map(
+    (d) =>
+      new Order({
+        sku: d.SKU,
+        description: d.Description,
+        weeks2: d.Weeks2,
+        weeks4: d.Weeks4,
+        ioQty: d.IOQty,
+        cat: d.Cat,
+        totalNeeded: d.totalNeeded,
+      })
+  );
+
+  try {
+    mapData.forEach(async (d) => await d.save());
+    res.status(200).send(mapData);
+  } catch (err) {
+    res.status(400).send(err);
+  }
+});
+
+router.get("/order/deleteBom", async (res, req) => {
+  try {
+    await Bom.deleteMany({});
+  } catch (err) {
+    res.status(400).send(err);
+  }
+});
+
+router.post("/order/uploadBom", async (req, res) => {
+  const bomList = [...req.body];
+
+  const mapData = bomList.map(
+    (d) =>
+      new Bom({
+        _id: d.sku,
+        sku: d.sku,
+        skuComponent: d.skuComponent,
+        skuComponentQty: d.skuComponentQty,
+        comps: d.comps,
+      })
+  );
+
+  try {
+    mapData.forEach(async (d) => await d.save());
+    res.status(200).send(mapData);
   } catch (err) {
     res.status(400).send(err);
   }
