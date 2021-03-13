@@ -165,13 +165,13 @@ router.get("/order/all", async (req, res) => {
   const priorValue = prior === "true" ? "high" : "low";
   const search = req.query.search ? req.query.search : "";
 
-  if (req.query.completed) {
-    match.completed = req.query.completed === "true";
-  }
-  if (req.query.sortBy) {
-    const parts = req.query.sortBy.split(":");
-    sort[parts[0]] = part[1] === "desc" ? -1 : 1;
-  }
+  // if (req.query.completed) {
+  //   match.completed = req.query.completed === "true";
+  // }
+  // if (req.query.sortBy) {
+  //   const parts = req.query.sortBy.split(":");
+  //   sort[parts[0]] = part[1] === "desc" ? -1 : 1;
+  // }
   try {
     const docCount = await Order.estimatedDocumentCount();
     const highOrderCount = await Order.countDocuments({ priority: "high" });
@@ -183,7 +183,8 @@ router.get("/order/all", async (req, res) => {
         .skip((page - 1) * pagination)
         .limit(pagination);
       const orderLength = order.length;
-      res.status(200).send({ order, countData, orderLength });
+
+      return res.status(200).send({ order, countData, orderLength });
     }
     if (filter == "all") {
       const order = await Order.find({ priority: `${priorValue}` })
